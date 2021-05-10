@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!--
+Emily Campa; Student ID #0463272
+Mobile App Dev; ITSE-1333-NT1-21/SP; Prof. I. Sheffield
+Final
+-->
+<meta charset="utf-8" />
+<title>Amortization Calculations</title>
+<link href="CampaCSS.css" rel="stylesheet" />
+<script>
+function getInput()
+{
+	//Get values from user input
+	var balance = parseFloat(document.getElementById("principal").value);
+	var interestRate = parseFloat(document.getElementById("interest").value/100.0);
+	var years = parseInt(document.getElementById("years").value);
+	
+	var div = document.getElementById("Result");
+	div.innerHTML = "";
+	div.innerHTML += calcAmortization(balance, interestRate, years); 	
+}
+
+//Calculate schedule
+function calcAmortization(balance, interestRate, years)
+{
+    //Interest per month
+	var monthlyRate = interestRate/12;
+	
+	//Total payment per month
+    var payment = balance * (monthlyRate/(1-Math.pow(1+monthlyRate, -(years*12))));
+	    
+	//Loan summary
+    var outcome = "<h1 style='color:dodgerblue'>&nbsp;&nbsp;Loan Summary&nbsp;&nbsp;</h1><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Loan Amount: $" + balance.toFixed(2) +  "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Interest Rate: " + (interestRate*100).toFixed(2) +  "%<br>" +
+        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Number of Years: " + years + "<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Total of All Payments Including Principal and Interest: $" + 
+		(payment * (years*12)).toFixed(2) + "<br><br>";
+        
+    //Table headers
+	//Col 1 - Month; Col 2 - Remaining Balance; Col 3 - Interest that month; Col 4 - Monthly Payment; Col 5 - Remaining Principal
+	outcome += "<table border='1' background-color='CornflowerBlue' style='margin-left:auto; margin-right:auto'><tr><th>Month</th><th>Remaining Balance</th><th>Interest this Payment</th>" +
+	"<th>Month's Payment Amount</th><th>Remaining Principal</th>";
+    
+    //Calculate monthly amounts and add row to table
+	for (var count = 0; count < (years*12); ++count)
+	{ 
+		var interest = 0;
+		var monthlyPayment = 0;
+		var yearNumber = count+1;
+		var remainder = yearNumber % 12;
+		
+		//add row
+		outcome += "<tr align=center>";
+		
+		//Month number & year number  										---- Column 1: MONTH
+		if (remainder == 0)
+		{
+			outcome += "<td><b>End Year "+ (yearNumber/12) + "</b></td>";
+		}
+		else
+		{
+			outcome += "<td>" + (count + 1) + "</td>";
+		}
+		
+		//Remaining balance													---- Column 2: REMAINING BALANCE
+		outcome += "<td> $" + balance.toFixed(2) + "</td>";
+		
+		//Interest that month												---- Column 3: INTEREST THAT MONTH
+		interest = balance * monthlyRate;
+		outcome += "<td> $" + interest.toFixed(2) + "</td>";
+		
+		//Monthly payment													---- Column 4: MONTHLY PAYMENT
+		monthlyPayment = payment - interest;
+		outcome += "<td> $" + monthlyPayment.toFixed(2) + "</td>";
+		
+		//new principal interest											---- Column 5: REMAINING PRINCIPAL
+		var monthlyPrincipal = balance - payment + interest;
+		outcome += "<td> $"+ monthlyPrincipal.toFixed(2) + "</td>";
+		
+		//end table row	
+		outcome += "</tr>";
+		
+		//update balance to reflect payment
+		balance = balance - monthlyPayment;	
+			
+	}
+    outcome += "</table>";
+    return outcome;
+}
+</script>
+</head>
+<body>
+	<h1>&nbsp;&nbsp;Loan Amortization Calculator</h1>	
+	<div style="text-align: center">
+		<label for="principal"><b>Enter Principal:</b></label>
+		<input type="number" id="principal" placeholder="$" /><br>
+		<label for="interest"><b>Enter Interest:&nbsp;&nbsp;</b></label>
+		<input type="number" id="interest" placeholder="%"/><br>
+		<label for="years"><b>Enter Years:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></label>
+		<input type="number" id="years" placeholder="#"/><br>
+		<input type="button" value="Calculate" onclick="getInput()" />	
+	</div>		
+	
+	<p id="Result"></p>				
+</body>
+</html>
